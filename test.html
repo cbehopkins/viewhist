@@ -1,0 +1,6 @@
+<h1>Home {{.Title}}</h1>
+
+<form action="/view/{{.NextPageId}}" method="POST">
+{{printf "%s" .Body}}
+<div><input type="submit" value="view"></div>
+</form>
