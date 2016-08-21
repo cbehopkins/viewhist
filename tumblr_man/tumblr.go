@@ -4,9 +4,13 @@ package tumblr_man
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"log"
+	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/cbehopkins/viewhist/common"
 
 	"github.com/MariaTerzieva/gotumblr"
 	"github.com/dghubble/oauth1"
@@ -25,42 +29,6 @@ var config oauth1.Config
 //	fmt.Println("Hello World!")
 //}
 // Each blog has a progress through it
-const (
-	TumblrBlg = iota
-)
-
-type BlogProgress struct {
-	BlogType  int
-	ViewCount int
-}
-
-// Each user is subscribed to a number of blogs
-type UserConfig struct {
-	// There is one of these per user
-	// TBD add things like the login paraneters to the services into here
-	Token  string `json:"token"`
-	Secret string `json:"secret"`
-
-	Subscribed map[string]*BlogProgress `json:"blg_prg"`
-}
-type AppConfig struct {
-	ConsumerKey string `json:"consumer_key"`
-	SecretKey   string `json:"secret_key"`
-}
-
-func NewAppConfig(consumer_key, secret_key string) *AppConfig {
-	itm := new(AppConfig)
-	itm.ConsumerKey = consumer_key
-	itm.SecretKey = secret_key
-	return itm
-}
-func NewUserConfig() *UserConfig {
-	itm := new(UserConfig)
-	itm.Token = ""
-	itm.Secret = ""
-	itm.Subscribed = make(map[string]*BlogProgress)
-	return itm
-}
 
 type BlogStruct struct {
 	// The aim here is to keep the produced JSON as small as possible
@@ -89,14 +57,9 @@ func UnMarshalJson(input []byte) (v *BlogStruct, err error) {
 	return
 }
 
-type Bgbody struct {
-	Id    int
-	Title string
-	Line  []string
-}
-
-func GetPosts(count, offset int, blg_2_get string, cfg *UserConfig, app AppConfig) []Bgbody {
-	ret_posts := make([]Bgbody, count)
+func GetPosts(count, offset int, blg_2_get string, cfg *common.UserConfig, app common.AppConfig) []common.Bgbody {
+	fmt.Println("Running GetPosts")
+	ret_posts := make([]common.Bgbody, count)
 	blog_array, err := GetTumblr(count, offset, blg_2_get, cfg, app)
 	check(err)
 	for i, blpost := range blog_array {
@@ -104,7 +67,7 @@ func GetPosts(count, offset int, blg_2_get string, cfg *UserConfig, app AppConfi
 
 		r := strings.NewReplacer("<p>", "", "</p>", "", "<br/>", "", "<b>", "", "</b>", "\n")
 		tt0 := strings.Split(r.Replace(html_post), "\n")
-		var ttp Bgbody
+		var ttp common.Bgbody
 
 		ttp.Line = make([]string, len(tt0))
 		copy(ttp.Line, tt0)
@@ -117,7 +80,7 @@ func GetPosts(count, offset int, blg_2_get string, cfg *UserConfig, app AppConfi
 	return ret_posts
 }
 
-func getUsrStrings(cfg *UserConfig) (token, secret string) {
+func getUsrStrings(cfg *common.UserConfig) (token, secret string) {
 
 	//get_key()
 	token = cfg.Token
@@ -125,7 +88,7 @@ func getUsrStrings(cfg *UserConfig) (token, secret string) {
 	return
 }
 
-func GetTumblr(count, offset int, blg_2_get string, cfg *UserConfig, app AppConfig) (blog_array []*BlogStruct, err error) {
+func GetTumblr(count, offset int, blg_2_get string, cfg *common.UserConfig, app common.AppConfig) (blog_array []*BlogStruct, err error) {
 	consumer_key := app.ConsumerKey
 	secret_key := app.SecretKey
 	token, secret := getUsrStrings(cfg)
@@ -173,7 +136,32 @@ func GetTumblr(count, offset int, blg_2_get string, cfg *UserConfig, app AppConf
 
 	return
 }
-func get_key(app AppConfig) {
+
+type APageT struct {
+	Title string
+	Body  string
+}
+
+func RenderAddForm(w http.ResponseWriter) {
+	AddPage := APageT{Title: "Add a Tumblr", Body: "Test"}
+	template, err := template.ParseFiles("src/github.com/cbehopkins/flktst/add_tumblr.html")
+	if err != nil {
+		panic(err)
+	}
+	err = template.Execute(w, AddPage)
+	check(err)
+}
+func InterpretAddForm(w http.ResponseWriter, r *http.Request) {
+	// add code here to:
+	// Get the current username from the cookie
+	// Extract the required blog name from the submitted tumblradd text field
+	// Add this to the required data structure
+	// Return to root
+
+	http.Redirect(w, r, "/", 301)
+
+}
+func get_key(app common.AppConfig) {
 	// read credentials from constants
 	//consumerKey, consumerSecret := getAppStrings()
 	consumer_key := app.ConsumerKey

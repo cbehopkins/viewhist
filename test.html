@@ -1,6 +1,9 @@
-<h1>Home {{.Title}}</h1>
-
-<form action="/view/{{.NextPageId}}" method="POST">
-{{printf "%s" .Body}}
-<div><input type="submit" value="view"></div>
+<h1>What do you want to do?</h1>
+<form action="/" method="POST">
+<p>Current Username:{{.Username}}</P><br>
+<input type="radio" name="action" value="view" checked> View Content<br>
+<input type="radio" name="action" value="add"> Add Content<br>
+<input type="radio" name="action" value="login"> Login<br>
+<input type="radio" name="action" value="logout"> Logout<br>
+<input type="submit" name="res" value="ok">
 </form>
