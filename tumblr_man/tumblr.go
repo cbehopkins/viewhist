@@ -65,7 +65,7 @@ func GetPosts(count, offset int, blg_2_get string, cfg *common.UserConfig, app c
 	for i, blpost := range blog_array {
 		html_post := blpost.Body
 
-		r := strings.NewReplacer("<p>", "", "</p>", "", "<br/>", "", "<b>", "", "</b>", "\n")
+		r := strings.NewReplacer("<p>", "", "</p>", "", "<br/>", "", "<b>", "", "</b>", "\n", "<span>", "", "</span>", "", "<strong>", "", "</strong>", "")
 		tt0 := strings.Split(r.Replace(html_post), "\n")
 		var ttp common.Bgbody
 
@@ -103,14 +103,22 @@ func GetTumblr(count, offset int, blg_2_get string, cfg *common.UserConfig, app 
 	//for _, ky := range following.Blogs {
 	//	fmt.Println(ky)
 	//}
-	post_options := make(map[string]string)
-	post_options["limit"] = strconv.Itoa(count)
-	post_options["offset"] = strconv.Itoa(offset)
 
+	// First run a fetch just to get the number of posts in totoal
+	// undet the category of text
+	post_options := make(map[string]string)
+	post_options["limit"] = strconv.Itoa(1)
+	post_options["offset"] = strconv.Itoa(0)
 	blg := client.Posts(blg_2_get, "text", post_options)
 
+	// Now ask for the oldest post
+	reversed_offset := blg.Total_posts - int64(offset)
+	post_options["limit"] = strconv.Itoa(count)
+	post_options["offset"] = strconv.Itoa(int(reversed_offset))
+	blg = client.Posts(blg_2_get, "text", post_options)
+
 	num_of_blogs := len(blg.Posts)
-	fmt.Println("There are ", num_of_blogs, "Posts")
+	//fmt.Printf("Requested offset %d, Reversed offset %d, Num_posts %d, total %d \n", offset, reversed_offset, num_of_blogs, blg.Total_posts)
 
 	//steve := blg.Posts[1]
 	//_, err = UnMarshalJson(steve)
@@ -131,7 +139,7 @@ func GetTumblr(count, offset int, blg_2_get string, cfg *common.UserConfig, app 
 		check(err)
 		//r_txt := tmp.Body
 		//fmt.Printf("%s", r_txt)
-		blog_array[i] = tmp
+		blog_array[(num_of_blogs-i)-1] = tmp
 	}
 
 	return

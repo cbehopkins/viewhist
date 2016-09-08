@@ -8,6 +8,6 @@ type BlogProgress struct {
 func (bp BlogProgress) GetViewCount() int {
 	return bp.ViewCount
 }
-func (bp BlogProgress) SetViewCount(val int) {
+func (bp *BlogProgress) SetViewCount(val int) {
 	bp.ViewCount = val
 }

@@ -5,7 +5,7 @@
 		<title>{{.Title}}</title>
 	</head>
 	<body>
-<form action="/steve/" method="POST">
+<form action="/view/" method="POST">
 		{{range .Items}}<div><h1>Page {{.Id}}</h2><h3>{{.Title}}</h3>{{range .Line}}<p>{{ . }}</p>{{end}}</div><hr></hr>{{else}}<div><strong>no rows</strong></div>{{end}}
 		
 		<div><input type="text" value="{{.DefaultCountValue}}" name="count"><input type="submit" value="view"></div>

@@ -124,7 +124,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	var HomePage common.Page
 	HomePage = common.Page{Title: "Login"}
 	// TBD this is misnamed
-	template, err := template.ParseFiles("src/github.com/cbehopkins/flktst/login_user.html")
+	template, err := template.ParseFiles("src/github.com/cbehopkins/viewhist/login_user.html")
 	if err != nil {
 		cwd, _ := os.Getwd()
 		fmt.Println("running in directory ", cwd)
@@ -172,7 +172,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	template, err := template.ParseFiles("src/github.com/cbehopkins/flktst/test.html")
+	template, err := template.ParseFiles("src/github.com/cbehopkins/viewhist/test.html")
 	if err != nil {
 		cwd, _ := os.Getwd()
 		fmt.Println("running in directory ", cwd)
@@ -231,7 +231,7 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 	//sub_map.Lock()
 	//defer sub_map.Unlock()
 
-	template, err := template.ParseFiles("src/github.com/cbehopkins/flktst/add.html")
+	template, err := template.ParseFiles("src/github.com/cbehopkins/viewhist/add.html")
 	if err != nil {
 		cwd, _ := os.Getwd()
 		fmt.Println("running in directory ", cwd)
@@ -295,7 +295,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		// Update the view count to the number that the user has seen
 		// TBD do this on the next page fetch in a series?
 		blog_progress.SetViewCount(current_page_id + num_to_fetch)
-		//fmt.Println("Got pageid as current_page_id, %x, next is %x,  %s\n", current_page_id, next_page_id, r.URL.Path)
+		fmt.Printf("Got pageid as current_page_id, %x, next is %s\n", current_page_id, blg_2_get)
 		//fmt.Println("page title is", title_string)
 		post_bodies := tumblr_man.GetPosts(num_to_fetch, current_page_id, blg_2_get, sub_map.UsrInfo[service_username], sub_map.AppCfg)
 		blog_array = append(blog_array, post_bodies...)
@@ -309,7 +309,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	p.DefaultCountValue = num_to_fetch
 
 	// Parse the template ready to render out the final page
-	t, err := template.ParseFiles("src/github.com/cbehopkins/flktst/view.html")
+	t, err := template.ParseFiles("src/github.com/cbehopkins/viewhist/view.html")
 	if err != nil {
 		cwd, _ := os.Getwd()
 		fmt.Println("running in directory ", cwd)
