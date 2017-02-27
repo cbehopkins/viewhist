@@ -73,7 +73,7 @@ func GetPosts(count, offset int, blg_2_get string, cfg *common.UserConfig, app c
 		copy(ttp.Line, tt0)
 		//ret_posts[i] = Bgbody{Line: []string{html_post}}
 		ret_posts[i].Line = tt0
-		ret_posts[i].Id = offset + i
+		ret_posts[i].Id = blpost.Id
 		ret_posts[i].Title = blpost.Title
 	}
 

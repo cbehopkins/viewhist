@@ -2,8 +2,6 @@
 package main
 
 //import (
-//	"fmt"
-
 //	"github.com/dghubble/oauth1"
 //	//	"github.com/MariaTerzieva/gotumblr"
 //)
@@ -294,6 +292,8 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		current_page_id := blog_progress.GetViewCount()
 		// Update the view count to the number that the user has seen
 		// TBD do this on the next page fetch in a series?
+		// So as part of the page we build to send we should say which posts go into it
+		// Then when that page is posted again we can tick those off the list
 		blog_progress.SetViewCount(current_page_id + num_to_fetch)
 		fmt.Printf("Got pageid as current_page_id, %x, next is %s\n", current_page_id, blg_2_get)
 		//fmt.Println("page title is", title_string)
