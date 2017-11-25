@@ -35,7 +35,7 @@ type BlogStruct struct {
 	BlogName  string   `json:"blog_name,attr"`
 	PostUrl   string   `json:"post_url,attr"`
 	Body      string   `json:"body,omitempty"`
-	Id        int      `json:"id,attr"`
+	Id        int64    `json:"id,attr"`
 	CType     string   `json:"type,attr":`
 	Date      string   `json:"date,attr":`
 	Timestamp int      `json:"timestamp,attr"`
@@ -58,23 +58,23 @@ func UnMarshalJson(input []byte) (v *BlogStruct, err error) {
 }
 
 func GetPosts(count, offset int, blg_2_get string, cfg *common.UserConfig, app common.AppConfig) []common.Bgbody {
-	fmt.Println("Running GetPosts")
-	ret_posts := make([]common.Bgbody, count)
+	fmt.Printf("****Running GetPosts\nGet 0x%x posts, start at post 0x%x\n", count, offset)
+	ret_posts := make([]common.Bgbody, 0, count)
 	blog_array, err := GetTumblr(count, offset, blg_2_get, cfg, app)
 	check(err)
 	for i, blpost := range blog_array {
 		html_post := blpost.Body
-
+		var bob common.Bgbody
+		ret_posts = append(ret_posts, bob) // Stupid I have to create a new Bgbody to do this
 		r := strings.NewReplacer("<p>", "", "</p>", "", "<br/>", "", "<b>", "", "</b>", "\n", "<span>", "", "</span>", "", "<strong>", "", "</strong>", "")
 		tt0 := strings.Split(r.Replace(html_post), "\n")
-		var ttp common.Bgbody
-
-		ttp.Line = make([]string, len(tt0))
-		copy(ttp.Line, tt0)
-		//ret_posts[i] = Bgbody{Line: []string{html_post}}
 		ret_posts[i].Line = tt0
 		ret_posts[i].Id = blpost.Id
 		ret_posts[i].Title = blpost.Title
+		ret_posts[i].Time = blpost.Timestamp
+		if !(len(ret_posts[i].Line) > 0) {
+			fmt.Println("Zero Length post:", blpost)
+		}
 	}
 
 	return ret_posts
@@ -112,7 +112,11 @@ func GetTumblr(count, offset int, blg_2_get string, cfg *common.UserConfig, app 
 	blg := client.Posts(blg_2_get, "text", post_options)
 
 	// Now ask for the oldest post
-	reversed_offset := blg.Total_posts - int64(offset)
+	//reversed_offset := blg.Total_posts - int64(offset)
+	reversed_offset := int64(offset)
+	if int64(count) > blg.Total_posts {
+		return
+	}
 	post_options["limit"] = strconv.Itoa(count)
 	post_options["offset"] = strconv.Itoa(int(reversed_offset))
 	blg = client.Posts(blg_2_get, "text", post_options)
